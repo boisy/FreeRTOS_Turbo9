@@ -50,8 +50,8 @@ dsk: main.obj
 	decb dskini freertos.dsk
 	echo "10 LOADM\"FRTOS.BIN\":EXEC" > /tmp/loader.bas
 	decb copy -b -0 -t /tmp/loader.bas freertos.dsk,\AUTOEXEC.BAS
+	decb copy -b -0 -t /tmp/loader.bas freertos.dsk,\*.BAS
 	decb copy -b -2 main.obj freertos.dsk,FRTOS.BIN
 
 reload:
 	osascript -e 'tell application "DriveWire"' -e 'tell server of every document' -e 'reload drive 0' -e 'end tell' -e 'end tell'
-

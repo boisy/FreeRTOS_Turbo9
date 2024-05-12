@@ -158,8 +158,7 @@ asm { sts sReg }
     while (1)
     {
         printf("S = $%04X!\n", sReg);
-        vTaskDelay(100);
-//        portYIELD();
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
@@ -172,22 +171,9 @@ int ATTR_BANK0 main ( void )
                                     "D0",
                                     demoSTACK_SIZE,
                                     NULL,
-                                    2,
+                                    0,
                                     ( TaskHandle_t * ) &t1 );
                                     
-     ret = xTaskCreate(   vDemoTask,
-                                    "D1",
-                                    demoSTACK_SIZE,
-                                    NULL,
-                                    2,
-                                    ( TaskHandle_t * ) &t2 );
-
-     ret = xTaskCreate(   vDemoTask,
-                                    "D3",
-                                    demoSTACK_SIZE,
-                                    NULL,
-                                    2,
-                                    ( TaskHandle_t * ) &t3 );
 #if 0
 	vStartPolledQueueTasks( mainQUEUE_POLL_PRIORITY );
 	vStartDynamicPriorityTasks();
@@ -205,8 +191,6 @@ int ATTR_BANK0 main ( void )
 	/* All the tasks have been created - start the scheduler. */
 #endif
     printf("Starting scheduler\n");
-    vTaskResume(t1);
-    vTaskResume(t2);
 	vTaskStartScheduler();
           
 	/* Should not reach here! */

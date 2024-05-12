@@ -87,9 +87,9 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 
 	/* Next are all the registers that form part of the task context. */
 
-        /* U register */
-        *--pxTopOfStack = ( StackType_t ) 0xff;
-        *--pxTopOfStack = ( StackType_t ) 0xee;
+    /* U register */
+    *--pxTopOfStack = ( StackType_t ) 0xff;
+    *--pxTopOfStack = ( StackType_t ) 0xee;
 
 	/* Y register */
 	*--pxTopOfStack = ( StackType_t ) 0xff;
@@ -118,7 +118,6 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 	a critical section). */
 	*--pxTopOfStack = ( StackType_t ) 0x00;
 
-
 	return pxTopOfStack;
 }
 /*-----------------------------------------------------------*/
@@ -138,13 +137,16 @@ static void prvSetupTimerInterrupt( void )
     int *orgIRQAddress = 0x10D;
     int *orgSWIAddress = 0x107;
 
+    char *orgSWIVector = 0x106;
+
  portDISABLE_INTERRUPTS()
     /* save off original IRQ address */
     capturedIRQAddress = *orgIRQAddress;
     capturedSWIAddress = *orgSWIAddress;
 
     *orgIRQAddress = vPortTickInterrupt;
-    *orgSWIAddress = vPortTickInterrupt;
+    *orgSWIVector = 0x7E;
+    *orgSWIAddress = vPortYield;
 portENABLE_INTERRUPTS()
 }
 
@@ -158,10 +160,8 @@ BaseType_t xPortStartScheduler( void )
 	/* Restore the context of the first task. */
 	portRESTORE_CONTEXT();
 
-        asm {
-            wait@:
-                    cwai #^$50
-                    bra wait@
+    asm {
+        rti
     }
 
 	/* Should not get here! */
